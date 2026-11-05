@@ -1,0 +1,14 @@
+{
+  "name": "daytrack",
+  "version": "1.0.0",
+  "description": "DayTrack - Minimalist Daily Task Management & Reflection System",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "npm run build --prefix frontend",
+    "start": "npm run start --prefix backend",
+    "test": "npm run test --prefix backend",
+    "lint": "npm run lint --prefix frontend"
+  }
+}
+

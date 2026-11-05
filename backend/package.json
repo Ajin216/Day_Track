@@ -1,0 +1,24 @@
+{
+  "name": "daytrack-backend",
+  "version": "1.0.0",
+  "description": "DayTrack MERN Backend API",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "NODE_ENV=test node --test test/backend.test.js test/analytics.test.js test/audit_security.test.js test/goal.test.js test/historical_policy.test.js test/google_auth.test.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "google-auth-library": "^10.9.1",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.9.5"
+  }
+}
