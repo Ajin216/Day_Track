@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { Analytics } from '@vercel/analytics/react'
 import { ThemeProvider } from './context/ThemeContext'
 import { AuthProvider } from './context/AuthContext'
 import { SelectedDateProvider } from './context/SelectedDateContext'
@@ -17,7 +18,7 @@ import Register from './pages/Register'
 const Calendar = lazy(() => import('./pages/Calendar'))
 const Tasks = lazy(() => import('./pages/Tasks'))
 const Journal = lazy(() => import('./pages/Journal'))
-const Analytics = lazy(() => import('./pages/Analytics'))
+const AnalyticsPage = lazy(() => import('./pages/Analytics'))
 const Achievements = lazy(() => import('./pages/Achievements'))
 const Settings = lazy(() => import('./pages/Settings'))
 
@@ -46,7 +47,7 @@ export default function App() {
                           <Route path="/calendar" element={<Calendar />} />
                           <Route path="/tasks" element={<Tasks />} />
                           <Route path="/journal" element={<Journal />} />
-                          <Route path="/analytics" element={<Analytics />} />
+                          <Route path="/analytics" element={<AnalyticsPage />} />
                           <Route path="/achievements" element={<Achievements />} />
                           <Route path="/settings" element={<Settings />} />
                         </Route>
@@ -56,6 +57,7 @@ export default function App() {
                       <Route path="*" element={<Navigate to="/dashboard" replace />} />
                     </Routes>
                   </Suspense>
+                  <Analytics />
                 </BrowserRouter>
               </MonthlyGoalProvider>
             </DailyReviewProvider>
