@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import Sidebar from './Sidebar'
 import Navbar from './Navbar'
+import Footer from './Footer'
 import DataMigrationBanner from '../common/DataMigrationBanner'
 import MonthlyGoalBanner from '../goals/MonthlyGoalBanner'
 
@@ -42,10 +43,13 @@ export default function MainLayout() {
 
         {/* Scrollable Page Body */}
         <main className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="max-w-7xl mx-auto">
+          <div className="max-w-7xl mx-auto flex flex-col min-h-full">
             <DataMigrationBanner />
             <MonthlyGoalBanner />
-            <Outlet />
+            <div className="flex-1">
+              <Outlet />
+            </div>
+            <Footer />
           </div>
         </main>
       </div>
