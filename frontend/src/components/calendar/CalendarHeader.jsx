@@ -65,7 +65,7 @@ export default function CalendarHeader({
           Today
         </button>
 
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-50/80 dark:bg-blue-950/50 border border-blue-200/80 dark:border-blue-900/60 text-xs font-medium text-blue-900 dark:text-blue-200 min-w-0 max-w-full">
+        <div className="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-50/80 dark:bg-blue-950/50 border border-blue-200/80 dark:border-blue-900/60 text-xs font-medium text-blue-900 dark:text-blue-200 min-w-0 max-w-full">
           <span className="text-blue-600 dark:text-blue-400 font-semibold shrink-0">
             Selected:
           </span>
