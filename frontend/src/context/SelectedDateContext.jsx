@@ -1,81 +1,94 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useState, useMemo, useCallback } from 'react'
-import { format, parse, isValid } from 'date-fns'
+import { format, isValid } from 'date-fns'
 import { useAuth } from './AuthContext'
+import {
+  isValidDateString,
+  getTodayStringInTimezone,
+  getMillisecondsUntilMidnight,
+  getLocalTodayString,
+} from '../utils/dateUtils'
+
+export {
+  isValidDateString,
+  getTodayStringInTimezone,
+  getMillisecondsUntilMidnight,
+  getLocalTodayString,
+}
 
 const SelectedDateContext = createContext(undefined)
 
-const STORAGE_KEY = 'daytrack_selected_date'
-
-/**
- * Checks whether a given string is a valid strictly-formatted YYYY-MM-DD date.
- */
-export const isValidDateString = (str) => {
-  if (typeof str !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(str)) {
-    return false
-  }
-  const parsed = parse(str, 'yyyy-MM-dd', new Date())
-  return isValid(parsed) && format(parsed, 'yyyy-MM-dd') === str
-}
-
-/**
- * Returns today's date formatted as YYYY-MM-DD in the given timezone.
- * Falls back to local system date if timezone formatting fails.
- */
-export const getTodayStringInTimezone = (timezone = 'Asia/Kolkata') => {
-  try {
-    const formatter = new Intl.DateTimeFormat('en-CA', {
-      timeZone: timezone,
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    })
-    return formatter.format(new Date())
-  } catch (err) {
-    console.warn('Timezone calculation error, falling back to local date:', err)
-    return format(new Date(), 'yyyy-MM-dd')
-  }
-}
-
-/**
- * Returns today's local date in YYYY-MM-DD format (legacy helper).
- */
-export const getLocalTodayString = () => {
-  return format(new Date(), 'yyyy-MM-dd')
-}
-
 export function SelectedDateProvider({ children }) {
-  const { user } = useAuth()
-  const userTimezone = user?.timezone || 'Asia/Kolkata'
+  const { user, isAuthenticated } = useAuth()
+  const userTimezone = user?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Kolkata'
 
-  // Compute today dynamically using user's configured timezone
-  const today = useMemo(() => {
-    return getTodayStringInTimezone(userTimezone)
-  }, [userTimezone])
+  // Dynamic today state based on user's timezone
+  const [today, setToday] = useState(() => getTodayStringInTimezone(userTimezone))
 
-  const [selectedDate, setSelectedDateState] = useState(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY)
-      if (saved && isValidDateString(saved)) {
-        return saved
-      }
-    } catch (e) {
-      console.warn('Unable to read selected date from localStorage:', e)
+  // Selected date state: always initializes to current local date on application load
+  const [selectedDate, setSelectedDateState] = useState(() => getTodayStringInTimezone(userTimezone))
+
+  // When user logs in or authenticates, automatically select the current local date
+  const [prevUserId, setPrevUserId] = useState(user?.id)
+  if (user?.id !== prevUserId) {
+    setPrevUserId(user?.id)
+    if (isAuthenticated) {
+      const currentToday = getTodayStringInTimezone(userTimezone)
+      setToday(currentToday)
+      setSelectedDateState(currentToday)
     }
-    // Default to today's date in user's timezone
-    return getTodayStringInTimezone(userTimezone)
-  })
+  }
 
-  // Persist selected date to localStorage
+  // Synchronize date at midnight and handle tab visibility/focus/overnight transitions
   useEffect(() => {
-    try {
-      if (isValidDateString(selectedDate)) {
-        localStorage.setItem(STORAGE_KEY, selectedDate)
-      }
-    } catch (e) {
-      console.warn('Unable to persist selected date to localStorage:', e)
+    let midnightTimer = null
+    let intervalTimer = null
+
+    const syncDateTransition = () => {
+      const currentToday = getTodayStringInTimezone(userTimezone)
+      setToday((prevToday) => {
+        if (prevToday !== currentToday) {
+          // Date transition occurred: automatically advance selectedDate to new today
+          setSelectedDateState(currentToday)
+          return currentToday
+        }
+        return prevToday
+      })
     }
-  }, [selectedDate])
+
+    const scheduleMidnightCheck = () => {
+      if (midnightTimer) clearTimeout(midnightTimer)
+      const ms = getMillisecondsUntilMidnight(userTimezone)
+      midnightTimer = setTimeout(() => {
+        syncDateTransition()
+        scheduleMidnightCheck()
+      }, ms)
+    }
+
+    // Schedule exact midnight timer
+    scheduleMidnightCheck()
+
+    // 30-second periodic safeguard for clock skew or system background throttling
+    intervalTimer = setInterval(syncDateTransition, 30000)
+
+    // Wake-up check: recalculate current date when tab becomes visible or receives focus
+    const handleFocusOrVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        syncDateTransition()
+        scheduleMidnightCheck()
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleFocusOrVisibility)
+    window.addEventListener('focus', handleFocusOrVisibility)
+
+    return () => {
+      if (midnightTimer) clearTimeout(midnightTimer)
+      if (intervalTimer) clearInterval(intervalTimer)
+      document.removeEventListener('visibilitychange', handleFocusOrVisibility)
+      window.removeEventListener('focus', handleFocusOrVisibility)
+    }
+  }, [userTimezone])
 
   const setSelectedDate = useCallback((newDate) => {
     let dateStr = ''

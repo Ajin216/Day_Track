@@ -7,8 +7,8 @@ import { useSelectedDate } from '../../context/SelectedDateContext'
 /**
  * Returns a time-based greeting for the current local time.
  */
-function getLocalGreeting() {
-  const hour = new Date().getHours()
+function getLocalGreeting(dateContext) {
+  const hour = dateContext ? new Date().getHours() : new Date().getHours()
   if (hour < 12) {
     return 'Good morning'
   }
@@ -27,7 +27,7 @@ export default function DashboardHeader({
   const selectedDate = propSelectedDate || selectedDateCtx?.selectedDate || ''
   const isToday = propIsToday !== undefined ? propIsToday : selectedDateCtx?.isToday
 
-  const greeting = useMemo(() => getLocalGreeting(), [])
+  const greeting = useMemo(() => getLocalGreeting(selectedDate), [selectedDate])
 
   const formattedDate = useMemo(() => {
     try {

@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { parse, addMonths, subMonths, format } from 'date-fns'
+import { parse, addMonths, subMonths, format, isValid } from 'date-fns'
 import {
   LayoutDashboard,
   CheckSquare,
@@ -20,6 +20,16 @@ export default function Calendar() {
   const [viewDate, setViewDate] = useState(() => {
     return parse(selectedDate, 'yyyy-MM-dd', new Date())
   })
+
+  // Synchronize calendar view month when selectedDate transitions into a new month
+  const [prevSelectedDate, setPrevSelectedDate] = useState(selectedDate)
+  if (selectedDate !== prevSelectedDate) {
+    setPrevSelectedDate(selectedDate)
+    const parsed = parse(selectedDate, 'yyyy-MM-dd', new Date())
+    if (isValid(parsed) && format(viewDate, 'yyyy-MM') !== format(parsed, 'yyyy-MM')) {
+      setViewDate(parsed)
+    }
+  }
 
   const handlePrevMonth = useCallback(() => {
     setViewDate((prev) => subMonths(prev, 1))
