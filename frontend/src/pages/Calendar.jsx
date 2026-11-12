@@ -3,10 +3,11 @@ import { parse, addMonths, subMonths, format, isValid } from 'date-fns'
 import { useSelectedDate } from '../context/SelectedDateContext'
 import CalendarHeader from '../components/calendar/CalendarHeader'
 import MonthlyCalendar from '../components/calendar/MonthlyCalendar'
-import SelectedDatePanel from '../components/calendar/SelectedDatePanel'
+import SelectedDateModal from '../components/calendar/SelectedDateModal'
 
 export default function Calendar() {
   const { selectedDate, setSelectedDate, today, isToday } = useSelectedDate()
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   // Track the month currently viewed in the calendar
   // Initialized to the month of the currently selected date
@@ -42,9 +43,14 @@ export default function Calendar() {
     (day) => {
       const dateString = format(day, 'yyyy-MM-dd')
       setSelectedDate(dateString)
+      setIsModalOpen(true)
     },
     [setSelectedDate],
   )
+
+  const handleCloseModal = useCallback(() => {
+    setIsModalOpen(false)
+  }, [])
 
   return (
     <div className="space-y-6">
@@ -58,23 +64,19 @@ export default function Calendar() {
         isToday={isToday}
       />
 
-      {/* Main Responsive Layout: Monthly Calendar Grid alongside Contextual Selected-Date Panel */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Monthly Interactive Calendar Grid (8 cols on xl, 7 on lg) */}
-        <div className="lg:col-span-7 xl:col-span-8">
-          <MonthlyCalendar
-            viewDate={viewDate}
-            selectedDate={selectedDate}
-            today={today}
-            onSelectDate={handleSelectDate}
-          />
-        </div>
+      {/* Monthly Interactive Calendar Grid (Full Width) */}
+      <MonthlyCalendar
+        viewDate={viewDate}
+        selectedDate={selectedDate}
+        today={today}
+        onSelectDate={handleSelectDate}
+      />
 
-        {/* Contextual Selected-Date Panel (4 cols on xl, 5 on lg, sticky on desktop) */}
-        <div className="lg:col-span-5 xl:col-span-4 lg:sticky lg:top-6">
-          <SelectedDatePanel onJumpToday={handleToday} />
-        </div>
-      </div>
+      {/* Contextual Modal for Selected Date */}
+      <SelectedDateModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+      />
     </div>
   )
 }
