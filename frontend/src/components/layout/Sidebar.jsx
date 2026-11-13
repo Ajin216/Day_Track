@@ -9,8 +9,8 @@ import {
   Settings,
   LogOut,
   X,
-  Sparkles,
 } from 'lucide-react'
+import logo from '../../assets/logo.png'
 import { useAuth } from '../../context/AuthContext'
 
 const navigationItems = [
@@ -62,9 +62,11 @@ export default function Sidebar({ isMobile = false, onClose }) {
           onClick={handleNavClick}
           className="flex items-center gap-2.5 text-slate-900 dark:text-slate-100 font-bold text-lg tracking-tight focus:outline-none"
         >
-          <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-sm">
-            <Sparkles className="w-5 h-5" />
-          </div>
+          <img
+            src={logo}
+            alt="DayTrack Logo"
+            className="w-9 h-9 object-contain drop-shadow-xs"
+          />
           <div className="flex flex-col">
             <span className="leading-tight">DayTrack</span>
             <span className="text-[10px] font-medium tracking-normal text-slate-400 dark:text-slate-500 uppercase">

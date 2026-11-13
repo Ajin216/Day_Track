@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Sparkles, User, Mail, Lock, Eye, EyeOff, AlertCircle, ArrowRight } from 'lucide-react'
+import { User, Mail, Lock, Eye, EyeOff, AlertCircle, ArrowRight } from 'lucide-react'
+import logo from '../assets/logo.png'
 import { useAuth } from '../context/AuthContext'
 import ThemeToggle from '../components/common/ThemeToggle'
 import GoogleSignInButton from '../components/auth/GoogleSignInButton'
@@ -71,9 +72,11 @@ export default function Register() {
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         {/* Brand Logo & Heading */}
         <div className="flex justify-center">
-          <div className="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-md">
-            <Sparkles className="w-6 h-6" />
-          </div>
+          <img
+            src={logo}
+            alt="DayTrack Logo"
+            className="w-16 h-16 object-contain drop-shadow-md"
+          />
         </div>
         <h2 className="mt-4 text-center text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">
           Create your DayTrack account
